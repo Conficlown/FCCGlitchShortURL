@@ -59,14 +59,6 @@ app.get('/api/is-mongoose-ok', function(req, res) {
   }
 });
 
-app.get('/api/initiate', function(req, res) {
-  var initalList = new UrlShortList({original_url: "www.google.com", short_url: 1});
-  initalList.save((err, doc)=>{
-    if(err) {console.log(err);}
-    res.json(doc);
-  });
-});
-
 app.post("/api/shorturl/new", (req, res)=>{
   var url = req.body.url.toLowerCase();
   if(req.body.url){
@@ -110,6 +102,23 @@ app.post("/api/shorturl/new", (req, res)=>{
     });
   }else{
     res.json({error: "Empty url!"});
+  }
+});
+
+app.get('/api/shorturl/:short', (req, res)=>{
+  var shortid = req.params.short;
+  // console.log(shortid);
+  if(shortid<=0){
+    res.json({error: "short url invald"});
+  }else{
+    UrlShortList.findOne({short_url: shortid}, (err, doc)=>{
+      if(err) {return console.log(err)};
+      if(doc){
+        res.redirect("http://"+doc.original_url);
+      }else{
+        res.json({error: "URL doesn't exist"});
+      }
+    });
   }
 });
 
